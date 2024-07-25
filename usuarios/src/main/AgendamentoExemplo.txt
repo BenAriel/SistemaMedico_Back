@@ -1,0 +1,7 @@
+{
+  "dataConsulta":"25-02-2010",
+  "motivoConsulta":"sexo",
+   "horaConsulta":"16-30",
+    "localConsulta":"OitavaRosado",
+    "observacoes":"nada"
+}
