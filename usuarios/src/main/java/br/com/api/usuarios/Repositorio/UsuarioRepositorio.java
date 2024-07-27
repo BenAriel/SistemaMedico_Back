@@ -7,5 +7,5 @@ import br.com.api.usuarios.modelo.UsuarioModelo;
 
 @Repository
 public interface UsuarioRepositorio  extends CrudRepository<UsuarioModelo, Long> {
-    
+    UsuarioModelo findByEmailAndSenha(String email, String senha);
 }

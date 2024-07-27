@@ -11,7 +11,6 @@ import br.com.api.usuarios.modelo.UsuarioModelo;
 
 @Service
 public class UsuarioServico {
-    //listar todos os usuários. Esse método equivale ao select * from usuarios.
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
 
@@ -39,6 +38,15 @@ public class UsuarioServico {
         else
         {
             return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(um), HttpStatus.CREATED);
+        }
+    }
+    public ResponseEntity<?> loginUsuario(String email, String senha) {
+        UsuarioModelo usuario = usuarioRepositorio.findByEmailAndSenha(email, senha);
+        if (usuario != null) {
+            return new ResponseEntity<UsuarioModelo>(usuario, HttpStatus.OK);
+        } else {
+            respostaModelo.setMensagem("Email ou senha inválidos");
+            return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.UNAUTHORIZED);
         }
     }
 
