@@ -1,5 +1,7 @@
 package br.com.api.usuarios.servico;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,47 +13,45 @@ import br.com.api.usuarios.modelo.UsuarioModelo;
 
 @Service
 public class UsuarioServico {
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioServico.class);
+
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
 
-
     @Autowired
     private RespostaModelo respostaModelo;
-    //metodo para cadastrar
 
+    // método para cadastrar
     public ResponseEntity<?> cadastrarUsuario(UsuarioModelo um) {
-        if(um.getNome() == null || um.getNome().isEmpty() || um.getNome().isBlank() || um.getNome().equals(""))
-        {
+        logger.info("Recebendo dados do usuário: {}", um);
+
+        if (um.getNome() == null || um.getNome().isEmpty()) {
             respostaModelo.setMensagem("Nome é obrigatório");
-            return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-        }
-        else if(um.getEmail() == null || um.getEmail().isEmpty() || um.getEmail().isBlank() || um.getEmail().equals(""))
-        {
+            return new ResponseEntity<>(respostaModelo, HttpStatus.BAD_REQUEST);
+        } else if (um.getEmail() == null || um.getEmail().isEmpty()) {
             respostaModelo.setMensagem("Email é obrigatório");
-            return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-        }
-        else if(um.getSenha() == null || um.getSenha().isEmpty() || um.getSenha().isBlank() || um.getSenha().equals(""))
-        {
+            return new ResponseEntity<>(respostaModelo, HttpStatus.BAD_REQUEST);
+        } else if (um.getSenha() == null || um.getSenha().isEmpty()) {
             respostaModelo.setMensagem("Senha é obrigatório");
-            return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-        }
-        else
-        {
-            return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(um), HttpStatus.CREATED);
+            return new ResponseEntity<>(respostaModelo, HttpStatus.BAD_REQUEST);
+        } else {
+            UsuarioModelo salvo = usuarioRepositorio.save(um);
+            logger.info("Usuário salvo com sucesso: {}", salvo);
+            return new ResponseEntity<>(salvo, HttpStatus.CREATED);
         }
     }
+
     public ResponseEntity<?> loginUsuario(String email, String senha) {
         UsuarioModelo usuario = usuarioRepositorio.findByEmailAndSenha(email, senha);
         if (usuario != null) {
-            return new ResponseEntity<UsuarioModelo>(usuario, HttpStatus.OK);
+            return new ResponseEntity<>(usuario, HttpStatus.OK);
         } else {
             respostaModelo.setMensagem("Email ou senha inválidos");
-            return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(respostaModelo, HttpStatus.UNAUTHORIZED);
         }
     }
 
     public Iterable<UsuarioModelo> listarUsuarios() {
         return usuarioRepositorio.findAll();
     }
-    
 }
