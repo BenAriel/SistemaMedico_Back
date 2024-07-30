@@ -4,4 +4,5 @@
    "horaConsulta":"16-30",
     "localConsulta":"OitavaRosado",
     "observacoes":"nada"
+     http.csrf(AbstractHttpConfigurer::disable)
 }

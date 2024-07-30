@@ -18,6 +18,7 @@ public class MedicoModelo {
     private Long id;
     private String nomeCompleto;
     private String conselhoMedico;
+    private boolean executor;
     private String ufConselho;
     private String numeroConselho;
     private String cbo;
