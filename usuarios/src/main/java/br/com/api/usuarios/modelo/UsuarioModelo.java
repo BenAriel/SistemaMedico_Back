@@ -19,6 +19,7 @@ public class UsuarioModelo {
     private String nome;
     private String email;
     private String senha;
+    private String senhaRecuperacao;
 
 }
 

@@ -59,6 +59,11 @@ public class AgendamentoServico {
             agendamento.setHoraConsulta(agendamentoMap.get("horaConsulta").toString());
             agendamento.setLocalConsulta(agendamentoMap.get("localConsulta").toString());
             agendamento.setObservacoes(agendamentoMap.get("observacoes").toString());
+
+            if (!isHorarioDisponivel(agendamento)) {
+                respostaModelo.setMensagem("Horário indisponível");
+                return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+            }
     
             return new ResponseEntity<AgendamentoModelo>(agendamentoRepositorio.save(agendamento), HttpStatus.OK);
     

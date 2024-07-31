@@ -1,5 +1,7 @@
 package br.com.api.usuarios.servico;
 
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class UsuarioServico {
 
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
+
+    @Autowired
+    private EmailServico emailServico;
 
     @Autowired
     private RespostaModelo respostaModelo;
@@ -57,6 +62,27 @@ public class UsuarioServico {
             return new ResponseEntity<>(respostaModelo, HttpStatus.UNAUTHORIZED);
         }
     }
+    public ResponseEntity<?> alterarSenha(String email, String novaSenha) {
+        UsuarioModelo usuario = usuarioRepositorio.findByEmail(email);
+        
+        if (usuario == null) {
+            respostaModelo.setMensagem("Usuário não encontrado");
+            return new ResponseEntity<>(respostaModelo, HttpStatus.NOT_FOUND);
+        }
+        
+        if (novaSenha == null || novaSenha.isEmpty()) {
+            respostaModelo.setMensagem("Nova senha é obrigatória");
+            return new ResponseEntity<>(respostaModelo, HttpStatus.BAD_REQUEST);
+        }
+        
+        
+        String encodedPassword = passwordEncoder.encode(novaSenha);
+        usuario.setSenha(encodedPassword);
+        
+        usuarioRepositorio.save(usuario);
+        respostaModelo.setMensagem("Senha alterada com sucesso");
+        return new ResponseEntity<>(respostaModelo, HttpStatus.OK);
+    }
 
     public ResponseEntity<RespostaModelo> deletarUsuario(Long id) {
         if (usuarioRepositorio.existsById(id)) {
@@ -69,7 +95,45 @@ public class UsuarioServico {
         }
     }
 
+    public ResponseEntity<RespostaModelo> recuperarSenha(String email) {
+        UsuarioModelo usuario = usuarioRepositorio.findByEmail(email);
+        if (usuario != null) {
+            int passwordCode = (new Random()).nextInt(9999);
+
+            emailServico.sendEmail(email, "Recuperação de senha", "Seu código é " + passwordCode);
+
+            usuario.setSenhaRecuperacao(String.valueOf(passwordCode));
+            System.out.println("Senha de recuperação: " + passwordCode);
+            usuarioRepositorio.save(usuario);
+            respostaModelo.setMensagem("Email enviado com sucesso");
+            return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.OK);
+        } else {
+            System.out.println("Email não encontrado");
+            respostaModelo.setMensagem("Email não encontrado");
+            return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.NOT_FOUND);
+        }
+    }
+
     public Iterable<UsuarioModelo> listarUsuarios() {
         return usuarioRepositorio.findAll();
     }
+
+    public ResponseEntity<RespostaModelo> verificarCodigo(String email, String codigo) {
+        
+        UsuarioModelo usuario = usuarioRepositorio.findByEmail(email);
+        
+        
+        if (usuario != null && codigo.equals(usuario.getSenhaRecuperacao())) {
+            usuario.setSenhaRecuperacao(null);
+            usuarioRepositorio.save(usuario);
+            
+            respostaModelo.setMensagem("Código verificado com sucesso");
+            return new ResponseEntity<>(respostaModelo, HttpStatus.OK);
+        } else {
+            respostaModelo.setMensagem("Código inválido ou usuário não encontrado");
+            return new ResponseEntity<>(respostaModelo, HttpStatus.UNAUTHORIZED);
+        }
+    }
+    
 }
+

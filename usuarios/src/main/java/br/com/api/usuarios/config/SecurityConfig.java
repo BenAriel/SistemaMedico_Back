@@ -39,7 +39,8 @@ public class SecurityConfig {
                     "/medico/{id}",
                     "/paciente/{id}",
                     "/agendamento/{id}",
-                    "/api/agendamentos/horariosDisponiveis"
+                    "/verificarCodigo",
+                    "/alterarSenha"
                 ).permitAll()
                 .anyRequest().authenticated()
             );

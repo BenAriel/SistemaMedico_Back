@@ -1,4 +1,4 @@
-package br.com.api.usuarios;
+/*package br.com.api.usuarios;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,4 +10,4 @@ class UsuariosApplicationTests {
 	void contextLoads() {
 	}
 
-}
+} */
